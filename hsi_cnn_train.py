@@ -50,8 +50,7 @@ parser.add_argument("--valsamples", help="Num of validation samples per class.",
 
 args = parser.parse_args()
 
-######################### delete contents of checkpoint folder ###################################
-utils.delete_folder_contents(args.checkpoint)
+utils.chp_folder(args.checkpoint)   # delete contents of checkpoint folder if it exists
 
 X,Y, num_bands = utils.load_data(args.data, args.masks, args.crop, args.classes, samples=args.samples, balance=args.balance)
 

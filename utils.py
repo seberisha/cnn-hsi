@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 #import classify
 #import matplotlib.pyplot as plt
 
+
 def envi_dims(data_path, masks_path):
     # create the reader object
     reader = hsi_cnn_reader(data_path,
@@ -14,6 +15,7 @@ def envi_dims(data_path, masks_path):
                             )
 
     return reader.data_dims()
+
 
 def cnn_metrics(data_path, masks_path, crop_size, num_classes, model):
 
@@ -55,6 +57,7 @@ def cnn_metrics(data_path, masks_path, crop_size, num_classes, model):
 
     return envi_probs, conf_mat
 
+
 def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npixels):
 
     # create the reader object
@@ -87,18 +90,29 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
 
     return envi_probs
 
-def delete_folder_contents(folder_path):
-    # delete contents of a folder
-    for the_file in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-                # elif os.path.isdir(file_path): shutil.rmtree(file_path)
-        except Exception as e:
-            print(e)
+
+def chp_folder(folder_path):
+    """
+    Create checkpoint folder if it doesn't exist. Otherwise delete folder contents.
+
+    @param folder_path: Path to directory - including directory name.
+    @return: True if successful.
+    """
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)    # create checkpoint dir if it doesn't exist
+    else:
+        # delete contents of folder
+        for the_file in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                    # elif os.path.isdir(file_path): shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
 
     return True
+
 
 def load_data(data_path, masks_path, crop_size, num_classes, samples=None, balance=False):
     # Load CNN data in a format readable by tflearn.
