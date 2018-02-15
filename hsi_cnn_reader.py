@@ -258,11 +258,9 @@ class hsi_cnn_reader(object):
             ns = self.__num_samples
             if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
                 ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
-            self.__samples_per_class[self.__mask_idx] = ns;
+            self.__samples_per_class[self.__mask_idx] = ns
             np.random.shuffle(idx)
             idx = idx[0:ns, :]
-
-        k = 0
 
         # increase number of samples by copying them over multiple times
         max_samples = np.amax(self.__samples_per_class)
@@ -273,6 +271,7 @@ class hsi_cnn_reader(object):
         for i in range(0, copy_times):
             l_idx = []  # indices of the loaded pixels
             np.random.shuffle(idx)
+            k = 0
             for (r, c) in idx:
                 r_begin = r - floor(self.__crop_size[0] / 2.0)
                 c_begin = c - floor(self.__crop_size[0] / 2.0)
@@ -289,6 +288,8 @@ class hsi_cnn_reader(object):
                         l_idx.append(k)  # keep track of the loaded indices
                 k += 1
             total_idx.append(idx[l_idx, :])  # save loaded indices
+
+        k = 0
 
         # copy the remaning samples so the total matches the max number
         # of samples chosen by user
