@@ -165,122 +165,158 @@ class hsi_cnn_reader(object):
                 return None
             self.__mask_idx = 0
 
-
-
         if self.__npixels:
             return self._loadbatch()
         else:
-            # Crop area around a pixel corresponding to a particular mask
-            idx = np.transpose(np.nonzero(self.__masks[:, :, self.__mask_idx]))
-            input_ = []
-            labels = []
-            total_idx = []  # all the loaded indices
-
-            if self.__num_samples is not None:
-                # use specific number of samples for training
-                ns = self.__num_samples
-                if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
-                    ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
-                self.__samples_per_class[self.__mask_idx] = ns;
-                np.random.shuffle(idx)
-                idx = idx[0:ns, :]
-
-            k = 0
-
             if self.__balance:
-                # increase number of samples by copying them over multiple times
-                max_samples = np.amax(self.__samples_per_class)
-                copy_times = int(floor(
-                    max_samples / self.__samples_per_class[self.__mask_idx, 0]))  # num of times to copy for even division
-                rem = max_samples % self.__samples_per_class[self.__mask_idx, 0]  # remaining samples
-
-                for i in range(0, copy_times):
-                    l_idx = []  # indices of the loaded pixels
-                    np.random.shuffle(idx)
-                    for (r, c) in idx:
-                        r_begin = r - floor(self.__crop_size[0] / 2.0)
-                        c_begin = c - floor(self.__crop_size[0] / 2.0)
-                        r_end = r_begin + self.__crop_size[0]
-                        c_end = c_begin + self.__crop_size[1]
-
-                        if r_begin >= 0 and c_begin >= 0:
-                            if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
-                                input_.append(self.__cur_data[r_begin:r_end,
-                                              c_begin:c_end,
-                                              :]
-                                              )
-                                labels.append(self.__mask_idx)
-                                l_idx.append(k)  # keep track of the loaded indices
-                        k += 1
-                    total_idx.append(idx[l_idx, :])  # save loaded indices
-
-                # copy the remaning samples so the total matches the max number
-                # of samples chosen by user
-                if rem > 0:
-                    l_idx = []  # indices of the loaded pixels
-                    np.random.shuffle(idx)
-                    idx = idx[0:rem, :]
-
-                    for (r, c) in idx:
-                        r_begin = r - floor(self.__crop_size[0] / 2.0)
-                        c_begin = c - floor(self.__crop_size[0] / 2.0)
-                        r_end = r_begin + self.__crop_size[0]
-                        c_end = c_begin + self.__crop_size[1]
-
-                        if r_begin >= 0 and c_begin >= 0:
-                            if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
-                                input_.append(self.__cur_data[r_begin:r_end,
-                                              c_begin:c_end,
-                                              :]
-                                              )
-                                labels.append(self.__mask_idx)
-                                l_idx.append(k) # keep track of the loaded indices
-                        k += 1
-                    total_idx.append(idx[l_idx, :])  # save loaded indices
-
-                self.__mask_idx += 1
-                return np.asarray(input_), labels, len(total_idx), total_idx
-
-
+                self._load_balanced_data()
             else:
-                l_idx = []  # indices of the loaded pixels
-
-                # read all masked pixels
-                for (r, c) in idx:
-                    r_begin = r - floor(self.__crop_size[0] / 2.0)
-                    c_begin = c - floor(self.__crop_size[0] / 2.0)
-                    r_end = r_begin + self.__crop_size[0]
-                    c_end = c_begin + self.__crop_size[1]
-                    # thresh=0.9
-                    # img_size = int(self.__crop_size[0] * self.__crop_size[1]*thresh)
-                    # print('\n\t img_size: ', img_size)
-
-                    if r_begin >= 0 and c_begin >= 0:
-                        if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
-                            # temp = self.__cur_data[r_begin:r_end,
-                            #             c_begin:c_end,
-                            #              ...]
-
-                            # if np.count_nonzero(np.sum(temp, axis=2)) > img_size:
-                            input_.append(self.__cur_data[r_begin:r_end,
-                                          c_begin:c_end, :])
-
-                            labels.append(self.__mask_idx)
-                            l_idx.append(k)
-                    k += 1
-                            # else:
-                            # print('\n\t too much background\n')
-                            # print('from next record: ', len(labels))
-                # keep only the indices of pixels which where loaded
-                idx = idx[l_idx, :]
-                self.__mask_idx += 1
-
-                return np.asarray(input_), labels, len(idx), idx
+                self._load_data()
 
 
+    def _load_data(self):
+        '''
+        Load data by cropping around each pixel for each mask.
 
+        @return:
+            # input_ - array of size num_samples x crop_size x crop_size x num_bands
+            # labels - vector of labels for the loaded samples
+            # len(idx) - number of loaded samples
+            # idx - indices of loaded pixels
+        '''
 
+        # Crop area around a pixel corresponding to a particular mask
+        idx = np.transpose(np.nonzero(self.__masks[:, :, self.__mask_idx]))
+        input_ = []
+        labels = []
+        total_idx = []  # all the loaded indices
 
+        if self.__num_samples is not None:
+            # use specific number of samples for training
+            ns = self.__num_samples
+            if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
+                ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
+            self.__samples_per_class[self.__mask_idx] = ns;
+            np.random.shuffle(idx)
+            idx = idx[0:ns, :]
+
+        k = 0
+
+        l_idx = []  # indices of the loaded pixels
+
+        # read all masked pixels
+        for (r, c) in idx:
+            r_begin = r - floor(self.__crop_size[0] / 2.0)
+            c_begin = c - floor(self.__crop_size[0] / 2.0)
+            r_end = r_begin + self.__crop_size[0]
+            c_end = c_begin + self.__crop_size[1]
+            # thresh=0.9
+            # img_size = int(self.__crop_size[0] * self.__crop_size[1]*thresh)
+            # print('\n\t img_size: ', img_size)
+
+            if r_begin >= 0 and c_begin >= 0:
+                if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
+                    # temp = self.__cur_data[r_begin:r_end,
+                    #             c_begin:c_end,
+                    #              ...]
+
+                    # if np.count_nonzero(np.sum(temp, axis=2)) > img_size:
+                    input_.append(self.__cur_data[r_begin:r_end,
+                                  c_begin:c_end, :])
+
+                    labels.append(self.__mask_idx)
+                    l_idx.append(k)
+            k += 1
+            # else:
+            # print('\n\t too much background\n')
+            # print('from next record: ', len(labels))
+        # keep only the indices of pixels which where loaded
+        idx = idx[l_idx, :]
+        self.__mask_idx += 1
+
+        return np.asarray(input_), labels, len(idx), idx
+
+    def _load_balanced_data(self):
+        '''
+        Load a balanced data set for a particular class.
+
+        @return:
+            # input_ - array of size num_samples x crop_size x crop_size x num_bands
+            # labels - vector of labels for the loaded samples
+            # len(total_idx) - number of loaded samples
+            # total_idx - indices of loaded pixels
+        '''
+
+        # Crop area around a pixel corresponding to a particular mask
+        idx = np.transpose(np.nonzero(self.__masks[:, :, self.__mask_idx]))
+        input_ = []
+        labels = []
+        total_idx = []  # all the loaded indices
+
+        if self.__num_samples is not None:
+            # use specific number of samples for training
+            ns = self.__num_samples
+            if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
+                ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
+            self.__samples_per_class[self.__mask_idx] = ns;
+            np.random.shuffle(idx)
+            idx = idx[0:ns, :]
+
+        k = 0
+
+        # increase number of samples by copying them over multiple times
+        max_samples = np.amax(self.__samples_per_class)
+        copy_times = int(floor(
+            max_samples / self.__samples_per_class[self.__mask_idx, 0]))  # num of times to copy for even division
+        rem = max_samples % self.__samples_per_class[self.__mask_idx, 0]  # remaining samples
+
+        for i in range(0, copy_times):
+            l_idx = []  # indices of the loaded pixels
+            np.random.shuffle(idx)
+            for (r, c) in idx:
+                r_begin = r - floor(self.__crop_size[0] / 2.0)
+                c_begin = c - floor(self.__crop_size[0] / 2.0)
+                r_end = r_begin + self.__crop_size[0]
+                c_end = c_begin + self.__crop_size[1]
+
+                if r_begin >= 0 and c_begin >= 0:
+                    if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
+                        input_.append(self.__cur_data[r_begin:r_end,
+                                      c_begin:c_end,
+                                      :]
+                                      )
+                        labels.append(self.__mask_idx)
+                        l_idx.append(k)  # keep track of the loaded indices
+                k += 1
+            total_idx.append(idx[l_idx, :])  # save loaded indices
+
+        # copy the remaning samples so the total matches the max number
+        # of samples chosen by user
+        if rem > 0:
+            l_idx = []  # indices of the loaded pixels
+            np.random.shuffle(idx)
+            idx = idx[0:rem, :]
+
+            for (r, c) in idx:
+                r_begin = r - floor(self.__crop_size[0] / 2.0)
+                c_begin = c - floor(self.__crop_size[0] / 2.0)
+                r_end = r_begin + self.__crop_size[0]
+                c_end = c_begin + self.__crop_size[1]
+
+                if r_begin >= 0 and c_begin >= 0:
+                    if r_end <= self.__cur_data.shape[0] and c_end <= self.__cur_data.shape[1]:
+                        input_.append(self.__cur_data[r_begin:r_end,
+                                      c_begin:c_end,
+                                      :]
+                                      )
+                        labels.append(self.__mask_idx)
+                        l_idx.append(k)  # keep track of the loaded indices
+                k += 1
+            total_idx.append(idx[l_idx, :])  # save loaded indices
+
+        self.__mask_idx += 1
+
+        return np.asarray(input_), labels, len(total_idx), total_idx
 
     def _loadbatch(self):
         '''
