@@ -169,9 +169,9 @@ class hsi_cnn_reader(object):
             return self._loadbatch()
         else:
             if self.__balance:
-                self._load_balanced_data()
+                return self._load_balanced_data()
             else:
-                self._load_data()
+                return self._load_data()
 
 
     def _load_data(self):
