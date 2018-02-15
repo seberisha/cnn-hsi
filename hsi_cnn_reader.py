@@ -174,6 +174,7 @@ class hsi_cnn_reader(object):
             idx = np.transpose(np.nonzero(self.__masks[:, :, self.__mask_idx]))
             input_ = []
             labels = []
+            total_idx = []  # all the loaded indices
 
             if self.__num_samples is not None:
                 # use specific number of samples for training
@@ -194,6 +195,7 @@ class hsi_cnn_reader(object):
                 rem = max_samples % self.__samples_per_class[self.__mask_idx, 0]  # remaining samples
 
                 for i in range(0, copy_times):
+                    l_idx = []  # indices of the loaded pixels
                     np.random.shuffle(idx)
                     for (r, c) in idx:
                         r_begin = r - floor(self.__crop_size[0] / 2.0)
@@ -208,11 +210,14 @@ class hsi_cnn_reader(object):
                                               :]
                                               )
                                 labels.append(self.__mask_idx)
-                                k += 1
+                                l_idx.append(k)  # keep track of the loaded indices
+                        k += 1
+                    total_idx.append(idx[l_idx, :])  # save loaded indices
 
                 # copy the remaning samples so the total matches the max number
                 # of samples chosen by user
                 if rem > 0:
+                    l_idx = []  # indices of the loaded pixels
                     np.random.shuffle(idx)
                     idx = idx[0:rem, :]
 
@@ -229,7 +234,13 @@ class hsi_cnn_reader(object):
                                               :]
                                               )
                                 labels.append(self.__mask_idx)
-                                k += 1
+                                l_idx.append(k) # keep track of the loaded indices
+                        k += 1
+                    total_idx.append(idx[l_idx, :])  # save loaded indices
+
+                self.__mask_idx += 1
+                return np.asarray(input_), labels, len(total_idx), total_idx
+
 
             else:
                 l_idx = []  # indices of the loaded pixels
@@ -262,10 +273,13 @@ class hsi_cnn_reader(object):
                             # print('from next record: ', len(labels))
                 # keep only the indices of pixels which where loaded
                 idx = idx[l_idx, :]
+                self.__mask_idx += 1
 
-            self.__mask_idx += 1
+                return np.asarray(input_), labels, len(idx), idx
 
-            return np.asarray(input_), labels, len(idx), idx
+
+
+
 
 
     def _loadbatch(self):

@@ -1,16 +1,9 @@
 import sys
 sys.path.append('/home/sberisha/source/stimlib/python')
-import hyperspectral
 import envi
-import classify
 import numpy
-import scipy
-import sklearn
-import sklearn.naive_bayes
 import sklearn.neural_network
 import glob
-import matplotlib.pyplot as plt
-from progressbar import ProgressBar
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
