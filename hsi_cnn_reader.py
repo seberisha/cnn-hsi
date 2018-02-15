@@ -173,7 +173,6 @@ class hsi_cnn_reader(object):
             else:
                 return self._load_data()
 
-
     def _load_data(self):
         '''
         Load data by cropping around each pixel for each mask.
@@ -181,8 +180,6 @@ class hsi_cnn_reader(object):
         @return:
             # input_ - array of size num_samples x crop_size x crop_size x num_bands
             # labels - vector of labels for the loaded samples
-            # len(idx) - number of loaded samples
-            # idx - indices of loaded pixels
         '''
 
         # Crop area around a pixel corresponding to a particular mask
@@ -234,7 +231,7 @@ class hsi_cnn_reader(object):
         idx = idx[l_idx, :]
         self.__mask_idx += 1
 
-        return np.asarray(input_), labels, len(idx), idx
+        return np.asarray(input_), labels
 
     def _load_balanced_data(self):
         '''
@@ -243,8 +240,6 @@ class hsi_cnn_reader(object):
         @return:
             # input_ - array of size num_samples x crop_size x crop_size x num_bands
             # labels - vector of labels for the loaded samples
-            # len(total_idx) - number of loaded samples
-            # total_idx - indices of loaded pixels
         '''
 
         # Crop area around a pixel corresponding to a particular mask
@@ -317,7 +312,7 @@ class hsi_cnn_reader(object):
 
         self.__mask_idx += 1
 
-        return np.asarray(input_), labels, len(total_idx), total_idx
+        return np.asarray(input_), labels
 
     def _loadbatch(self):
         '''
