@@ -145,6 +145,12 @@ class hsi_cnn_reader(object):
             self.__masks.append(temp)  # array consisting of all masks, size rows x cols x # of masks
             if self.__num_samples is None:
                 self.__samples_per_class[i] = np.count_nonzero(temp)
+            else:
+                # if user has specified a max number of samples per class
+                if self.__num_samples > np.count_nonzero(temp):
+                    self.__samples_per_class[i] = np.count_nonzero(temp)
+                else:
+                    self.__samples_per_class[i] = self.__num_samples
 
         self.__masks = np.asarray(self.__masks)
         self.__masks = np.transpose(self.__masks, (1, 2, 0))
@@ -190,12 +196,8 @@ class hsi_cnn_reader(object):
 
         if self.__num_samples is not None:
             # use specific number of samples for training
-            ns = self.__num_samples
-            if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
-                ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
-            self.__samples_per_class[self.__mask_idx] = ns;
             np.random.shuffle(idx)
-            idx = idx[0:ns, :]
+            idx = idx[0:self.__samples_per_class[self.__mask_idx], :]
 
         k = 0
 
@@ -250,12 +252,8 @@ class hsi_cnn_reader(object):
 
         if self.__num_samples is not None:
             # use specific number of samples for training
-            ns = self.__num_samples
-            if self.__num_samples > np.count_nonzero(self.__masks[:, :, self.__mask_idx]):
-                ns = np.count_nonzero(self.__masks[:, :, self.__mask_idx])
-            self.__samples_per_class[self.__mask_idx] = ns
             np.random.shuffle(idx)
-            idx = idx[0:ns, :]
+            idx = idx[0:self.__samples_per_class[self.__mask_idx], :]
 
         # increase number of samples by copying them over multiple times
         max_samples = np.amax(self.__samples_per_class)
@@ -399,15 +397,6 @@ class hsi_cnn_reader(object):
                         floor(max_samples / self.__samples_per_class[i, 0]))
                     num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
             else:
-                # if user has specified a max number of samples per class
-                ns = self.__num_samples
-                for i in range(0, self.__num_masks):
-                    if self.__num_samples > np.count_nonzero(self.__masks[:, :, i]):
-                        ns = np.count_nonzero(self.__masks[:, :, i])
-                        self.__samples_per_class[i] = ns
-                    else:
-                        self.__samples_per_class[i] = self.__num_samples
-
                 num_samples = 0
 
                 max_samples = np.amax(self.__samples_per_class)
