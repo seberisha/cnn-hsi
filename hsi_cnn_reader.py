@@ -136,7 +136,7 @@ class hsi_cnn_reader(object):
             # Load all mask files from the mask directory. 
         '''
         self.__num_masks = len(self.__masks_file_names)
-        self.__samples_per_class = np.zeros((self.__num_masks, 1), dtype=np.int32)
+        self.__samples_per_class = np.zeros(self.__num_masks, dtype=np.int32)
         for i in range(self.__num_masks):
             file_name = self.__masks_file_names[i]
             temp = imread(file_name, flatten=True)
