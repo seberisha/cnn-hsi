@@ -39,7 +39,7 @@ def build_net(network, X, Y, num_classes, num_epochs, checkpoint_path, size_batc
     network = conv_2d(network, 64, [2, 3], weights_init=nor, regularizer='L2', weight_decay=0.001)
     # network = batch_normalization(network)
     network = tflearn.activations.softplus(network)
-    network = max_pool_2d(network, [1, 2])
+    network = max_pool_2d(network, [2, 2])
     network = local_response_normalization(network)
     
     ###########################################################################
