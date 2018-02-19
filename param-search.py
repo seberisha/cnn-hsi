@@ -9,10 +9,23 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.datasets import load_digits
 from sklearn.ensemble import RandomForestClassifier
+import classify
+import glob
+import envi
 
-# get some data
-digits = load_digits()
-X, y = digits.data, digits.target
+# load train data
+data_path = '/media/stim-processed/berisha/breast-processing/lm/br1003/no-mnf/new-cnn/'
+masks_path = '/media/stim-processed/berisha/breast-processing/lm/br1003/masks/no-mnf-bcemn/'
+
+classimages = sorted(glob.glob(masks_path + '*.png'))  # load the class file names
+C = classify.filenames2class(classimages)  # generate the class images for training
+
+# open the ENVI file for reading, use the validation image for batch access
+Etrain = envi.envi(data_path + 'br1003-br2085b-bas-nor-fin-bip-pca16')
+x_train, y_train = Etrain.loadtrain(C)
+#x_train, y_train = Etrain.loadtrain_balance(C, num_samples=60000)
+Etrain.close()
+
 
 # build a classifier
 clf = RandomForestClassifier(n_estimators=20)
@@ -45,7 +58,7 @@ random_search = RandomizedSearchCV(clf, param_distributions=param_dist,
                                    n_iter=n_iter_search)
 
 start = time()
-random_search.fit(X, y)
+random_search.fit(x_train, y_train)
 print("RandomizedSearchCV took %.2f seconds for %d candidates"
       " parameter settings." % ((time() - start), n_iter_search))
 report(random_search.cv_results_)
@@ -61,7 +74,7 @@ param_grid = {"max_depth": [3, None],
 # run grid search
 grid_search = GridSearchCV(clf, param_grid=param_grid)
 start = time()
-grid_search.fit(X, y)
+grid_search.fit(x_train, y_train)
 
 print("GridSearchCV took %.2f seconds for %d candidate parameter settings."
       % (time() - start, len(grid_search.cv_results_['params'])))

@@ -36,8 +36,8 @@ def cnn_metrics(data_path, masks_path, crop_size, num_classes, model):
     k = 0
     print('\n Total number of pixels to classify: ', num_samples, '\n')
 
-    for (input_, labels, ns, idx) in reader:
-        if ns > 0:
+    for (input_, labels, idx) in reader:
+        if len(input_) > 0:
             i = 0
             y_true.append(labels)
             for j in idx:
