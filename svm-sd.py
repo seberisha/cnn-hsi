@@ -30,8 +30,8 @@ C = classify.filenames2class(classimages)  # generate the class images for train
 
 # open the ENVI file for reading, use the validation image for batch access
 Etrain = envi.envi(data_path + 'br1003-br2085b-bas-nor-fin-bip-pca16')
-x_train, y_train = Etrain.loadtrain(C)
-#x_train, y_train = Etrain.loadtrain_balance(C, num_samples=60000)
+#x_train, y_train = Etrain.loadtrain(C)
+x_train, y_train = Etrain.loadtrain_balance(C, num_samples=60000)
 Etrain.close()
 
 # load test data
@@ -101,15 +101,15 @@ for i, name, color in zip(range(num_classes), class_names, colors):
     plt.legend(loc="lower right")
     plt.show()
 
-plt.savefig('roc_auc_svm_sd.png')
+plt.savefig('roc_auc_svm_sd_balanced.png')
 
 fpr = np.array(fpr)
 tpr = np.array(tpr)
 thr = np.array(thr)
 auc_ = np.array(auc)
 
-io.savemat('fpr_svm_sd.mat', mdict={'fpr_svm_sd': fpr})
-io.savemat('tpr_svm_sd.mat', mdict={'tpr_svm_sd': tpr})
-io.savemat('auc_svm_sd.mat', mdict={'auc_svm_sd': auc_})
+io.savemat('fpr_svm_sd_balanced.mat', mdict={'fpr_svm_sd_balanced': fpr})
+io.savemat('tpr_svm_sd_balanced.mat', mdict={'tpr_svm_sd_balanced': tpr})
+io.savemat('auc_svm_sd_balanced.mat', mdict={'auc_svm_sd_balanced': auc_})
 
 

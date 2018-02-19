@@ -364,7 +364,7 @@ class hsi_cnn_reader(object):
             # keep only the indices of pixels which where loaded
             #idx = idx[l_idx, :]
 
-            return np.asarray(input_), labels, len(idx_chunk), idx_chunk
+            return np.asarray(input_), labels, idx_chunk
 
 
 
