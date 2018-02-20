@@ -93,7 +93,7 @@ colors = ['red', 'blue', 'green', 'yellow', 'magenta']
 class_names = ['blood', 'collagen', 'epithelium', 'myo', 'necrosis']
 for i, name, color in zip(range(num_classes), class_names, colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=lw,
-             label='{0} (auc = {1:0.2f})'.format(name, auc_[i]))
+             label='{0} (auc = {1:0.2f})'.format(name, auc_scores[i]))
     plt.plot([0, 1], [0, 1], 'k--', lw=lw)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
