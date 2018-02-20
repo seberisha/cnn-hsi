@@ -108,6 +108,7 @@ tpr = np.array(tpr)
 thr = np.array(thr)
 auc_ = np.array(auc)
 
+io.savemat('pred_prob_svm_sd_balanced.mat', mdict={'pred_prob_svm_sd_balanced': predict_proba})
 io.savemat('fpr_svm_sd_balanced.mat', mdict={'fpr_svm_sd_balanced': fpr})
 io.savemat('tpr_svm_sd_balanced.mat', mdict={'tpr_svm_sd_balanced': tpr})
 io.savemat('auc_svm_sd_balanced.mat', mdict={'auc_svm_sd_balanced': auc_})
