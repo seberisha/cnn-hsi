@@ -76,7 +76,7 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
     print('\n Total number of pixels to classify: ', num_samples, '\n')
     #plt.ion()
 
-    for (input_, _, idx) in reader:
+    for (input_, _, ns, idx) in reader:
         if len(input_) > 0:
             # Run the model
             prediction = model.predict(input_)

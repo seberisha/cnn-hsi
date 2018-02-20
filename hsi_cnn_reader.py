@@ -363,66 +363,65 @@ class hsi_cnn_reader(object):
 
         if len(idx) == self.__data_idx:  # if all of the pixels have been read in this mask, continue with the next mask
             self.__mask_idx += 1
-            self.__data_idx = 0
 
         return np.asarray(input_), labels, idx_chunk
 
 
-def data_dims(self):
-    '''
-        # Returns the predicted number of samples and the number of bands.
-    '''
+    def data_dims(self):
+        '''
+            # Returns the predicted number of samples and the number of bands.
+        '''
 
-    # these would be used to take care of boundary conditions
-    h_rep = 0
-    w_rep = 0
+        # these would be used to take care of boundary conditions
+        h_rep = 0
+        w_rep = 0
 
-    rows = self.__masks.shape[0] + h_rep
-    cols = self.__masks.shape[1] + w_rep
+        rows = self.__masks.shape[0] + h_rep
+        cols = self.__masks.shape[1] + w_rep
 
-    annotated_pixels = np.zeros((self.__masks.shape[0], self.__masks.shape[1]))
-    for i in range(self.__num_masks):
-        annotated_pixels += self.__masks[:, :, i]
+        annotated_pixels = np.zeros((self.__masks.shape[0], self.__masks.shape[1]))
+        for i in range(self.__num_masks):
+            annotated_pixels += self.__masks[:, :, i]
 
-    annotated_pixels[annotated_pixels > 1] = 0
-    num_samples = 0
+        annotated_pixels[annotated_pixels > 1] = 0
+        num_samples = 0
 
-    if self.__balance:
-        if self.__num_samples is None:
+        if self.__balance:
+            if self.__num_samples is None:
 
-            max_samples = np.amax(self.__samples_per_class)
+                max_samples = np.amax(self.__samples_per_class)
 
-            for i in range(0, self.__num_masks):
-                num_samples += self.__samples_per_class[i, 0] * int(
-                    floor(max_samples / self.__samples_per_class[i, 0]))
-                num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
-        else:
-            num_samples = 0
-
-            max_samples = np.amax(self.__samples_per_class)
-
-            for i in range(0, self.__num_masks):
-                num_samples += self.__samples_per_class[i] * int(
-                    floor(max_samples / self.__samples_per_class[i, 0]))
-                num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
-
-    elif self.__num_samples is None:
-
-        num_samples = np.count_nonzero(annotated_pixels)
-        # print('\n========>num_samples: ', num_samples)
-    else:
-        for i in range(0, self.__num_masks):
-            if self.__num_samples > np.count_nonzero(self.__masks[:, :, i]):
-                num_samples += np.count_nonzero(self.__masks[:, :, i])
+                for i in range(0, self.__num_masks):
+                    num_samples += self.__samples_per_class[i, 0] * int(
+                        floor(max_samples / self.__samples_per_class[i, 0]))
+                    num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
             else:
-                num_samples += self.__num_samples
-                # print('balancing -- num-samples: ', num_samples)
+                num_samples = 0
 
-    # assuming a reader object has been initialized and filenames has been loaded
-    file_name = self.__data_file_names[0]
-    file_name = path.join(self.__data_folder_name, file_name)
+                max_samples = np.amax(self.__samples_per_class)
 
-    # only load metadata
-    cur_data = envi.open(file_name + HDR_EXT, file_name)
+                for i in range(0, self.__num_masks):
+                    num_samples += self.__samples_per_class[i] * int(
+                        floor(max_samples / self.__samples_per_class[i, 0]))
+                    num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
 
-    return num_samples, cur_data.nbands, rows, cols
+        elif self.__num_samples is None:
+
+            num_samples = np.count_nonzero(annotated_pixels)
+            # print('\n========>num_samples: ', num_samples)
+        else:
+            for i in range(0, self.__num_masks):
+                if self.__num_samples > np.count_nonzero(self.__masks[:, :, i]):
+                    num_samples += np.count_nonzero(self.__masks[:, :, i])
+                else:
+                    num_samples += self.__num_samples
+                    # print('balancing -- num-samples: ', num_samples)
+
+        # assuming a reader object has been initialized and filenames has been loaded
+        file_name = self.__data_file_names[0]
+        file_name = path.join(self.__data_folder_name, file_name)
+
+        # only load metadata
+        cur_data = envi.open(file_name + HDR_EXT, file_name)
+
+        return num_samples, cur_data.nbands, rows, cols
