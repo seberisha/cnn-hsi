@@ -85,7 +85,9 @@ for i in range(0, num_classes):
     thr.append(th)
     auc_.append(auc(f, t))
 
-# Plot all ROC curves
+# Turn interactive plotting off
+plt.ioff()
+# save pllot all ROC curves
 lw = 2
 colors = ['red', 'blue', 'green', 'yellow', 'magenta']
 class_names = ['blood', 'collagen', 'epithelium', 'myo', 'necrosis']
@@ -99,7 +101,7 @@ for i, name, color in zip(range(num_classes), class_names, colors):
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend(loc="lower right")
-    plt.show()
+    #plt.show()
 
 plt.savefig('roc_auc_svm_sd_balanced.png')
 
