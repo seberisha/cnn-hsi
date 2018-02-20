@@ -165,18 +165,21 @@ class hsi_cnn_reader(object):
             #         -index of read pixels
         '''
         if utils.is_empty(self.__cur_data) or \
-                (self.__mask_idx == self.__num_masks and self.__data_idx == 0):
+                (self.__mask_idx == self.__num_masks):
+
             if not self._next_file():
                 return None
-            self.__mask_idx = 0
 
-        if self.__npixels:
-            return self._loadbatch()
-        else:
-            if self.__balance:
-                return self._load_balanced_data()
+            self.__mask_idx = 0
+            self.__data_idx == 0
+
+            if self.__npixels:
+                return self._loadbatch()
             else:
-                return self._load_data()
+                if self.__balance:
+                    return self._load_balanced_data()
+                else:
+                    return self._load_data()
 
     def _load_data(self):
         '''
