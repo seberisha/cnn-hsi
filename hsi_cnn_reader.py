@@ -173,13 +173,13 @@ class hsi_cnn_reader(object):
             self.__mask_idx = 0
             self.__data_idx == 0
 
-            if self.__npixels:
-                return self._loadbatch()
+        if self.__npixels:
+            return self._loadbatch()
+        else:
+            if self.__balance:
+                return self._load_balanced_data()
             else:
-                if self.__balance:
-                    return self._load_balanced_data()
-                else:
-                    return self._load_data()
+                return self._load_data()
 
     def _load_data(self):
         '''
