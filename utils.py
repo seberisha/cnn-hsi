@@ -74,13 +74,13 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
     pbar = ProgressBar(maxval=num_samples).start()
     k = 0
     print('\n Total number of pixels to classify: ', num_samples, '\n')
-    #plt.ion()
+    # plt.ion()
 
-    for (input_, _, ns, idx) in reader:
+    for (input_, _, idx) in reader:
         if len(input_) > 0:
             # Run the model
             prediction = model.predict(input_)
-            envi_probs[idx[:,0], idx[:,1], :] = np.asarray(prediction)
+            envi_probs[idx[:, 0], idx[:, 1], :] = np.asarray(prediction)
             #class_image = classify.prob2class(np.rollaxis(envi_probs, 2, 0))
             #rgb = classify.class2color(class_image)
             #plt.imshow(rgb)
