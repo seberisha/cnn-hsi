@@ -72,6 +72,7 @@ print('Linear SVM', ' test accuracy: ', accuracy_score(y_test, test_predictions)
 print('Linear SVM', ' confusion matrix \n', confusion_matrix(y_test, test_predictions))
 
 predict_proba = clf.predict_proba(x_test.transpose())  #predicted probabilities
+io.savemat('pred_prob_svm_sd_balanced.mat', mdict={'pred_prob_svm_sd_balanced': predict_proba})
 
 fpr = []
 tpr = []
@@ -109,7 +110,6 @@ tpr = np.array(tpr)
 thr = np.array(thr)
 auc_ = np.array(auc_scores)
 
-io.savemat('pred_prob_svm_sd_balanced.mat', mdict={'pred_prob_svm_sd_balanced': predict_proba})
 io.savemat('fpr_svm_sd_balanced.mat', mdict={'fpr_svm_sd_balanced': fpr})
 io.savemat('tpr_svm_sd_balanced.mat', mdict={'tpr_svm_sd_balanced': tpr})
 io.savemat('auc_svm_sd_balanced.mat', mdict={'auc_svm_sd_balanced': auc_})
