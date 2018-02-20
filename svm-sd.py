@@ -74,7 +74,7 @@ predict_proba = clf.predict_proba(x_test.transpose())  #predicted probabilities
 fpr = []
 tpr = []
 thr = []
-auc_ = []
+auc_scores = []
 
 for i in range(0, num_classes):
     class_mask = np.zeros(total_mask.shape)
@@ -83,7 +83,7 @@ for i in range(0, num_classes):
     fpr.append(f)
     tpr.append(t)
     thr.append(th)
-    auc_.append(auc(f, t))
+    auc_scores.append(auc(f, t))
 
 # Turn interactive plotting off
 plt.ioff()
@@ -108,7 +108,7 @@ plt.savefig('roc_auc_svm_sd_balanced.png')
 fpr = np.array(fpr)
 tpr = np.array(tpr)
 thr = np.array(thr)
-auc_ = np.array(auc)
+auc_ = np.array(auc_scores)
 
 io.savemat('pred_prob_svm_sd_balanced.mat', mdict={'pred_prob_svm_sd_balanced': predict_proba})
 io.savemat('fpr_svm_sd_balanced.mat', mdict={'fpr_svm_sd_balanced': fpr})
