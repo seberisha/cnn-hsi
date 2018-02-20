@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from scipy import io
 from sklearn.metrics import auc
+import matplotlib
+matplotlib.use('Agg')  # use backend that doesn't display to the user
 import matplotlib.pyplot as plt
 
 """
@@ -85,13 +87,10 @@ for i in range(0, num_classes):
     thr.append(th)
     auc_scores.append(auc(f, t))
 
-# Turn interactive plotting off
-plt.ioff()
-# save pllot all ROC curves
+# save a plot of all ROC curves
 lw = 2
 colors = ['red', 'blue', 'green', 'yellow', 'magenta']
 class_names = ['blood', 'collagen', 'epithelium', 'myo', 'necrosis']
-plt.figure()
 for i, name, color in zip(range(num_classes), class_names, colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=lw,
              label='{0} (auc = {1:0.2f})'.format(name, auc_[i]))
