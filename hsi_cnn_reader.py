@@ -260,8 +260,8 @@ class hsi_cnn_reader(object):
         # increase number of samples by copying them over multiple times
         max_samples = np.amax(self.__samples_per_class)
         copy_times = int(floor(
-            max_samples / self.__samples_per_class[self.__mask_idx, 0]))  # num of times to copy for even division
-        rem = max_samples % self.__samples_per_class[self.__mask_idx, 0]  # remaining samples
+            max_samples / self.__samples_per_class[self.__mask_idx]))  # num of times to copy for even division
+        rem = max_samples % self.__samples_per_class[self.__mask_idx]  # remaining samples
 
         for i in range(0, copy_times):
             l_idx = []  # indices of the loaded pixels
@@ -395,9 +395,9 @@ class hsi_cnn_reader(object):
                 max_samples = np.amax(self.__samples_per_class)
 
                 for i in range(0, self.__num_masks):
-                    num_samples += self.__samples_per_class[i, 0] * int(
-                        floor(max_samples / self.__samples_per_class[i, 0]))
-                    num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
+                    num_samples += self.__samples_per_class[i] * int(
+                        floor(max_samples / self.__samples_per_class[i]))
+                    num_samples += max_samples % self.__samples_per_class[i]  # add remaining samples
             else:
                 num_samples = 0
 
@@ -405,8 +405,8 @@ class hsi_cnn_reader(object):
 
                 for i in range(0, self.__num_masks):
                     num_samples += self.__samples_per_class[i] * int(
-                        floor(max_samples / self.__samples_per_class[i, 0]))
-                    num_samples += max_samples % self.__samples_per_class[i, 0]  # add remaining samples
+                        floor(max_samples / self.__samples_per_class[i]))
+                    num_samples += max_samples % self.__samples_per_class[i]  # add remaining samples
 
         elif self.__num_samples is None:
 
