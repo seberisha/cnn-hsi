@@ -86,7 +86,7 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
             #plt.imshow(rgb)
             #plt.pause(0.05)
             pbar.update(k)
-            k += npixels
+            k += len(input_)
 
     return envi_probs
 

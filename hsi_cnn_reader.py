@@ -370,7 +370,6 @@ class hsi_cnn_reader(object):
 
         return np.asarray(input_), labels, idx_chunk
 
-
     def data_dims(self):
         '''
             # Returns the predicted number of samples and the number of bands.
