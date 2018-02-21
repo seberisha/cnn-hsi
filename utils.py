@@ -138,7 +138,7 @@ def load_data(data_path, masks_path, crop_size, num_classes, samples=None, balan
     samples_per_class = np.zeros((num_classes, 1))
 
     # load  data
-    for (input_, labels) in reader:
+    for (input_, labels, _) in reader:
         if input_ is not None:
             num_samples = input_.shape[0]
             X[sidx:sidx + num_samples, :, :, :] = input_
