@@ -366,6 +366,7 @@ class hsi_cnn_reader(object):
 
         if len(idx) == self.__data_idx:  # if all of the pixels have been read in this mask, continue with the next mask
             self.__mask_idx += 1
+            self.__data_idx = 0
 
         return np.asarray(input_), labels, idx_chunk
 
