@@ -312,7 +312,7 @@ class hsi_cnn_reader(object):
 
         self.__mask_idx += 1
 
-        return np.asarray(input_), labels
+        return np.asarray(input_), labels, np.asarray(total_idx)
 
     def _loadbatch(self):
         '''

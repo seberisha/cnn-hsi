@@ -52,15 +52,18 @@ args = parser.parse_args()
 
 utils.chp_folder(args.checkpoint)   # delete contents of checkpoint folder if it exists
 
+print('\n.............loading training data...........\n')
 X,Y, num_bands = utils.load_data(args.data, args.masks, args.crop, args.classes, samples=args.samples, balance=args.balance)
-
+print('\n..............done loading training data.........\n')
 ###############################################################################
 # load new validation set
 ###############################################################################
 
 if args.validate:
     # load validation data from different envi file
+    print('\n...........loading validation data............\n')
     X_val,Y_val, num_bands = utils.load_data(args.valdata, args.valmasks, args.crop, args.classes, samples=args.valsamples, balance=args.valbalance)
+    print('\n...........done loading valdiation data......\n')
 else:
     # validate on a subset of training data
     X_val = None
