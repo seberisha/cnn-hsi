@@ -63,7 +63,7 @@ def build_net(network, X, Y, num_classes, num_epochs, checkpoint_path, size_batc
         start_time = time.time()
         if Xval is None or Yval is None:
             model.fit(X, Y, n_epoch=num_epochs,
-                      validation_set=0.2,
+                      validation_set=0.25,
                       show_metric=True, run_id='hsi_cnn_model', shuffle=True, batch_size=size_batch)
         else:
             model.fit(X, Y, n_epoch=num_epochs,

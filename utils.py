@@ -75,9 +75,12 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
     k = 0
     print('\n Total number of pixels to classify: ', num_samples, '\n')
     # plt.ion()
+    y_true = []
+    y_pred = []
 
-    for (input_, _, idx) in reader:
+    for (input_, labels, idx) in reader:
         if len(input_) > 0:
+            y_true.append(labels)
             # Run the model
             prediction = model.predict(input_)
             envi_probs[idx[:, 0], idx[:, 1], :] = np.asarray(prediction)
@@ -85,10 +88,16 @@ def cnn_classify_batch(data_path, masks_path, crop_size, num_classes, model, npi
             #rgb = classify.class2color(class_image)
             #plt.imshow(rgb)
             #plt.pause(0.05)
-            pbar.update(k)
+            #print('\n\t k: ', k)
+            y_pred.append(np.argmax(prediction, 1))
             k += len(input_)
+            pbar.update(k)
+    
+    y_true_flat = [item for sublist in y_true for item in sublist]
+    y_pred_flat = [item for sublist in y_pred for item in sublist]
+    conf_mat = confusion_matrix(y_true_flat, y_pred_flat)
 
-    return envi_probs
+    return envi_probs, conf_mat
 
 
 def chp_folder(folder_path):
