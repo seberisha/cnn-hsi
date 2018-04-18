@@ -90,11 +90,17 @@ model = hsi_cnn_model.build_net(network,
 model.load(args.checkpoint)
 
 total_samples = 0
-if args.npixels > 0:
+if args.npixels > 0 and args.metrics:
     print('\n\n ... classifying data using a load batch size of: ', args.npixels, ' pixels')
-    probs = utils.cnn_classify_batch(args.data, args.masks, args.crop, args.classes, model, args.npixels)
+    probs, conf_mat = utils.cnn_classify_batch(args.data, args.masks, args.crop, args.classes, model, args.npixels)
     # save response array as envi file
     envi.save_image(args.metrics + '-response.hdr', probs, dtype=np.float32, interleave='bsq', force=True)
+
+    print('\n Confusion matrix \n', conf_mat)
+    np.savetxt(args.metrics + '-conf-mat', conf_mat, delimiter=",", fmt="%1f")
+    oa = np.trace(conf_mat)/np.sum(conf_mat)
+    print('\n\t==================>OA: %0.2f%%' % (oa * 100))
+
     # save a classified image
     class_image = classify.prob2class(np.rollaxis(probs, 2, 0))
     rgb = classify.class2color(class_image)
