@@ -7,6 +7,7 @@ import re
 from math import floor
 import utils
 
+
 HDR_EXT = '.hdr'
 
 
@@ -312,7 +313,7 @@ class hsi_cnn_reader(object):
 
         self.__mask_idx += 1
 
-        return np.asarray(input_), labels, np.asarray(total_idx)
+        return np.asarray(input_, dtype=np.float32), labels, np.asarray(total_idx)
 
     def _loadbatch(self):
         '''

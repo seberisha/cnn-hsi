@@ -129,7 +129,7 @@ def load_data(data_path, masks_path, crop_size, num_classes, samples=None, balan
     num_samples, num_bands, _, _ = reader.data_dims()
     print('\n number of samples: ', num_samples, '\n')
 
-    X = np.zeros((num_samples, crop_size, crop_size, num_bands))
+    X = np.zeros((num_samples, crop_size, crop_size, num_bands), dtype=np.float32)
 
     Y = []
     i = 0
