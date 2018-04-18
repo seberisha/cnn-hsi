@@ -369,7 +369,7 @@ class hsi_cnn_reader(object):
             self.__mask_idx += 1
             self.__data_idx = 0
 
-        return np.asarray(input_), labels, idx_chunk
+        return np.asarray(input_, dtype=np.float32), labels, idx_chunk
 
     def data_dims(self):
         '''
