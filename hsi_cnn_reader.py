@@ -172,7 +172,7 @@ class hsi_cnn_reader(object):
                 return None
 
             self.__mask_idx = 0
-            self.__data_idx == 0
+            self.__data_idx = 0
 
         if self.__npixels:
             return self._loadbatch()
